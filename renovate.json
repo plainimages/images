@@ -1,0 +1,32 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "enabledManagers": ["custom.regex"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Upstream source pins in images/<app>/build.env",
+      "managerFilePatterns": [
+        "/^images/[^/]+/build\\.env$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: packageName=(?<packageName>\\S+))?(?: versioning=(?<versioning>\\S+))?\\s*\\nBUILD_ARG_UPSTREAM_TAG=(?<currentValue>\\S+)\\s*\\nBUILD_ARG_UPSTREAM_COMMIT=(?<currentDigest>[a-f0-9]{40})"
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "matchFileNames": [
+        "images/*/build.env"
+      ],
+      "additionalBranchPrefix": "upstream-",
+      "commitMessageTopic": "upstream {{depName}}",
+      "labels": [
+        "renovate",
+        "upstream"
+      ]
+    }
+  ]
+}
