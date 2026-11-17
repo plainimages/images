@@ -1,0 +1,23 @@
+on:
+  schedule:
+    - cron: "0 10 * * *"
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  build_images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: ./images/python
+          build-args: |
+            UPSTREAM_TAG=3.13
+          push: true
+          tags: python:3.13
