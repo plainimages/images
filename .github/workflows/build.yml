@@ -16,7 +16,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v7
         with:
-          context: ./images/python
+          file: ./images/python/Dockerfile
           build-args: |
             UPSTREAM_TAG=3.13
           push: true
