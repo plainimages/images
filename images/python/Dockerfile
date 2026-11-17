@@ -1,6 +1,5 @@
-
 ARG BASE_IMAGE=cgr.dev/chainguard/wolfi-base
 FROM ${BASE_IMAGE}
 
-ARG UPSTREAM_TAG
-RUN apk add --no-cache python-${UPSTREAM_TAG} py${UPSTREAM_TAG}-pip uv
+ARG SEMVER_VERSION
+RUN apk add --no-cache python-${SEMVER_VERSION} py${SEMVER_VERSION}-pip uv
