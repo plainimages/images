@@ -25,7 +25,7 @@ jobs:
             semver: "3.12"
           - name: python
             context: images/python
-            semver: "3.12"
+            semver: "3.13"
           - name: go
             context: images/go
             semver: "1.27"
