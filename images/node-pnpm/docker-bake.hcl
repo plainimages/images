@@ -1,5 +1,5 @@
 target "default" {
-  name    = "node-pnpm-${replace(version, ".", "-")}"
+  name    = "node-pnpm-${item.image_tag}"
   context = "."
   matrix  = {
     item = [

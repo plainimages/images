@@ -7,7 +7,6 @@ variable "UPSTREAM_COMMIT" {
 }
 
 target "default" {
-  name    = "clamav-api-${UPSTREAM_TAG}"
   context = "."
   args = {
     UPSTREAM_REPO   = "https://github.com/DevHatRo/ClamAV-API"
