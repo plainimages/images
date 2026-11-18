@@ -100,6 +100,9 @@ ARG UV_SYNC_EXTRA_ARGS
 ARG UV_SYNC_EXCLUDE_ARGS="--no-install-package peft --no-install-package virtualenv --no-install-package tree-sitter-javascript"
 
 COPY --from=src --chown=1001:0 /src/pyproject.toml /src/uv.lock ./
+
+# CVE-2026-49272
+RUN uv lock --upgrade-package 'oauthlib==4.0.1'
 RUN umask 002 && \
     UV_SYNC_ARGS="--frozen --no-install-project --no-dev --all-extras ${UV_SYNC_EXCLUDE_ARGS}" && \
     uv sync ${UV_SYNC_ARGS} ${UV_SYNC_EXTRA_ARGS} --no-extra flash-attn && \
