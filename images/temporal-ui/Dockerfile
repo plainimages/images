@@ -15,7 +15,8 @@ FROM ${NODE_IMAGE} AS ui-builder
 WORKDIR /home/ui-builder
 COPY --from=src /src/package.json /src/pnpm-lock.yaml /src/pnpm-workspace.yaml /src/.npmrc ./
 # --ignore-scripts skips `prepare`, which downloads a temporal binary and installs git hooks.
-RUN pnpm install --frozen-lockfile --ignore-scripts --config.node-version=22.23.4
+RUN pnpm config set node-version 22.23.4 \
+ && pnpm install --frozen-lockfile --ignore-scripts
 
 COPY --from=src /src/ ./
 RUN pnpm exec svelte-kit sync && pnpm build:server
