@@ -1,7 +1,7 @@
 ARG BASE_IMAGE=cgr.dev/chainguard/wolfi-base
 ARG GO_IMAGE=registry.opencode.de/oc000183114358/plainimages/go:1.27
 
-FROM alpine/git:2.49.1 AS src
+FROM alpine/git AS src
 ARG UPSTREAM_REPO
 ARG UPSTREAM_TAG
 ARG UPSTREAM_COMMIT

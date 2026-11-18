@@ -3,7 +3,7 @@ ARG NODE_IMAGE=ghcr.io/plainimages/node-pnpm:22-10
 ARG GO_IMAGE=ghcr.io/plainimages/go:1.26
 # Keep node, pnpm & go images in sync with versions inside of package.json & go.mod
 
-FROM alpine/git:2.49.1 AS src
+FROM alpine/git AS src
 ARG UPSTREAM_REPO
 ARG UPSTREAM_TAG
 ARG UPSTREAM_COMMIT
