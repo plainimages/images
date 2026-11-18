@@ -24,7 +24,7 @@ RUN CGO_ENABLED=0 go build -tags memoryprotection -buildvcs=false -v -ldflags=-c
 
 FROM ${FINAL_IMAGE} AS final
 
-COPY --from=ghcr.io/grpc-ecosystem/grpc-health-probe:v0.4.61 /ko-app/grpc-health-probe \
+COPY --from=ghcr.io/grpc-ecosystem/grpc-health-probe:v0.4.63 /ko-app/grpc-health-probe \
     /bin/grpc_health_probe
 COPY --from=spicedb-builder /go/src/app/spicedb /usr/local/bin/spicedb
 
