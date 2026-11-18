@@ -1,7 +1,7 @@
 ARG BASE_IMAGE=cgr.dev/chainguard/wolfi-base
-ARG GO_IMAGE=registry.opencode.de/oc000183114358/plainimages/go:1.27.3
+ARG GO_IMAGE=ghcr.io/plainimages/go:1.27
 
-FROM alpine/git:2.49.1 AS src
+FROM alpine/git AS src
 ARG UPSTREAM_REPO
 ARG UPSTREAM_TAG
 ARG UPSTREAM_COMMIT
@@ -13,6 +13,9 @@ FROM ${GO_IMAGE} AS builder
 ENV CGO_ENABLED=0
 WORKDIR /src/temporal
 COPY --from=src /src/ ./
+
+ARG GO_MOD_OVERRIDES="github.com/jackc/pgx/v5@v5.12.0"
+RUN go get ${GO_MOD_OVERRIDES} && go mod tidy
 RUN go build -tags disable_grpc_modules -o /out/temporal-server ./cmd/server
 
 FROM ${BASE_IMAGE} AS final
