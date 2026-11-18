@@ -1,6 +1,13 @@
 ARG BASE_IMAGE=cgr.dev/chainguard/wolfi-base
 ARG GO_IMAGE=registry.opencode.de/oc000183114358/plainimages/go:1.27
 
+FROM alpine/git:2.49.1 AS src
+ARG UPSTREAM_REPO
+ARG UPSTREAM_TAG
+ARG UPSTREAM_COMMIT
+RUN git clone --depth 1 --branch "${UPSTREAM_TAG}" "${UPSTREAM_REPO}" /src \
+ && test "$(git -C /src rev-parse HEAD)" = "${UPSTREAM_COMMIT}"
+
 FROM ${GO_IMAGE} AS builder
 ARG TARGETARCH=amd64
 
@@ -9,7 +16,7 @@ RUN apk add --no-cache protoc && \
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
 
 WORKDIR /src
-COPY . .
+COPY --from=src /src/ ./
 
 RUN protoc --go_out=. --go_opt=paths=source_relative \
            --go-grpc_out=. --go-grpc_opt=paths=source_relative \
@@ -51,13 +58,13 @@ RUN mkdir -p /var/run/clamav && \
     chmod 750 /var/run/clamav
 
 # Copy configurations
-COPY docker/clamavd/config/clamav /etc/clamav/
-COPY docker/common/config/supervisord.conf /etc/supervisord.conf
-COPY docker/clamavd/config/supervisord /etc/supervisor/conf.d/
+COPY --from=src /src/docker/clamavd/config/clamav /etc/clamav/
+COPY --from=src /src/docker/common/config/supervisord.conf /etc/supervisord.conf
+COPY --from=src /src/docker/clamavd/config/supervisord /etc/supervisor/conf.d/
 
 # Copy init scripts and set permissions
-COPY docker/common/init /init/
-COPY docker/docker-entrypoint.sh /docker-entrypoint.sh
+COPY --from=src /src/docker/common/init /init/
+COPY --from=src /src/docker/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh /init/* && \
     chown -R clamav:clamav /init /docker-entrypoint.sh && \
     chmod 755 /usr/sbin/clamd
