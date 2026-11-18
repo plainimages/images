@@ -24,14 +24,14 @@ WORKDIR /src
 COPY --from=src /src/temporal/go.mod /src/temporal/go.sum ./temporal/
 COPY --from=src /src/temporal/common/testx/go.mod ./temporal/common/testx/
 
-COPY --from=cli-src /src/cli/go.mod cli/go.sum ./cli/
-COPY --from=cli-src /src/cli/cliext/go.mod ./cli/cliext/
+COPY --from=cli-src /src/go.mod /src/go.sum ./cli/
+COPY --from=cli-src /src/cliext/go.mod ./cli/cliext/
 
 RUN go -C temporal mod download && \
     go -C cli mod download
 
 COPY --from=src /src/temporal/ ./temporal/
-COPY --from=cli-src /src/cli/ ./cli/
+COPY --from=cli-src /src/ ./cli/
 
 # Build temporal-tool cmd binaries
 RUN for t in cassandra sql elasticsearch; do \
