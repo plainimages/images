@@ -93,6 +93,8 @@ COPY --from=source /src/enterprise/pyproject.toml enterprise/
 COPY --from=source /src/litellm-proxy-extras/pyproject.toml litellm-proxy-extras/
 
 # Install third-party dependencies (cached unless pyproject.toml/uv.lock change)
+# CVE-2026-49272
+RUN uv lock --upgrade-package 'oauthlib==4.0.1'
 RUN uv sync --frozen --no-install-project --no-install-workspace --no-default-groups --no-editable \
     --extra proxy \
     --extra proxy-runtime \
