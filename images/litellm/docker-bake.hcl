@@ -12,7 +12,6 @@ target "default" {
     UPSTREAM_REPO   = "https://github.com/BerriAI/litellm"
     UPSTREAM_TAG    = UPSTREAM_TAG
     UPSTREAM_COMMIT = UPSTREAM_COMMIT
-    SEMVER_VERSION  = "3.12"
   }
   tags = ["ghcr.io/plainimages/litellm:${UPSTREAM_TAG}"]
 }

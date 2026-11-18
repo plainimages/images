@@ -1,9 +1,11 @@
 target "default" {
-  name    = "go-${replace(v, ".", "-")}"
+  name    = "go-${replace(version, ".", "-")}"
   matrix  = {
-    v = ["1.27"]
+    version = ["1.26", "1.27"]
   }
   context = "."
-  args    = { SEMVER_VERSION = v }
-  tags    = ["ghcr.io/plainimages/go:${v}"]
+  args    = {
+    SEMVER_VERSION = version
+  }
+  tags    = ["ghcr.io/plainimages/go:${version}"]
 }

@@ -1,0 +1,15 @@
+name: node-pnpm
+on:
+  schedule: [{ cron: "0 10 * * *" }]
+  push:
+    branches: [main]
+    paths: ["images/node-pnpm/**", ".github/workflows/_build.yml"]
+  pull_request:
+    paths: ["images/node-pnpm/**", ".github/workflows/_build.yml"]
+
+permissions: { contents: read, packages: write }
+
+jobs:
+  build:
+    uses: ./.github/workflows/_build.yml
+    with: { image: node-pnpm }
