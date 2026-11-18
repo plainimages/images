@@ -1,24 +1,37 @@
-
 ARG BASE_IMAGE=cgr.dev/chainguard/wolfi-base
 ARG GO_IMAGE=registry.opencode.de/oc000183114358/plainimages/go:1.27.3
+
+FROM alpine/git:2.49.1 AS src
+ARG UPSTREAM_REPO
+ARG UPSTREAM_TAG
+ARG UPSTREAM_COMMIT
+RUN git clone --depth 1 --branch "${UPSTREAM_TAG}" "${UPSTREAM_REPO}" /src \
+ && test "$(git -C /src rev-parse HEAD)" = "${UPSTREAM_COMMIT}"
+
+ FROM alpine/git:2.49.1 AS cli-src
+ ARG UPSTREAM_CLI_REPO
+ ARG UPSTREAM_CLI_TAG
+ ARG UPSTREAM_CLI_COMMIT
+ RUN git clone --depth 1 --branch "${UPSTREAM_CLI_TAG}" "${UPSTREAM_CLI_REPO}" /src \
+  && test "$(git -C /src rev-parse HEAD)" = "${UPSTREAM_CLI_COMMIT}"
 
 FROM ${GO_IMAGE} AS builder
 
 ARG TARGETARCH
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH}
-
 WORKDIR /src
 
-COPY temporal/go.mod temporal/go.sum ./temporal/
-COPY temporal/common/testx/go.mod ./temporal/common/testx/
-COPY cli/go.mod cli/go.sum ./cli/
-COPY cli/cliext/go.mod ./cli/cliext/
+COPY --from=src /src/temporal/go.mod /src/temporal/go.sum ./temporal/
+COPY --from=src /src/temporal/common/testx/go.mod ./temporal/common/testx/
+
+COPY --from=cli-src /src/cli/go.mod cli/go.sum ./cli/
+COPY --from=cli-src /src/cli/cliext/go.mod ./cli/cliext/
 
 RUN go -C temporal mod download && \
     go -C cli mod download
 
-COPY temporal/ ./temporal/
-COPY cli/ ./cli/
+COPY --from=src /src/temporal/ ./temporal/
+COPY --from=cli-src /src/cli/ ./cli/
 
 # Build temporal-tool cmd binaries
 RUN for t in cassandra sql elasticsearch; do \
@@ -31,7 +44,7 @@ RUN for t in cassandra sql elasticsearch; do \
 FROM ${BASE_IMAGE} AS final
 
 COPY --from=builder /out/ /usr/local/bin/
-COPY temporal/schema /etc/temporal/schema
+COPY --from=src /src/temporal/schema /etc/temporal/schema
 
 RUN apk add --no-cache \
     ca-certificates \
