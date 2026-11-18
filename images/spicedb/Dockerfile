@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=golang:1.27.3-alpine3.24
+ARG BASE_IMAGE=golang:1.27.4-alpine3.24
 ARG FINAL_IMAGE=cgr.dev/chainguard/static
 
 FROM alpine/git:latest AS src
