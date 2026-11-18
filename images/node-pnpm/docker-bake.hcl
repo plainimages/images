@@ -10,7 +10,7 @@ target "default" {
       },
       {
         node_version = "22"
-        pnpm_version = "11"
+        pnpm_version = "10"
         image_tag    = "22-10"
       },
       {

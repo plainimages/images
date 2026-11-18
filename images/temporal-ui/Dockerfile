@@ -1,6 +1,6 @@
 ARG BASE_IMAGE=cgr.dev/chainguard/wolfi-base
-ARG NODE_IMAGE=registry.opencode.de/oc000183114358/plainimages/node:22.23.4-pnpm10.10
-ARG GO_IMAGE=registry.opencode.de/oc000183114358/plainimages/go:1.26.10
+ARG NODE_IMAGE=ghcr.io/plainimages/node-pnpm:22-10
+ARG GO_IMAGE=ghcr.io/plainimages/go:1.26
 # Keep node, pnpm & go images in sync with versions inside of package.json & go.mod
 
 FROM alpine/git:2.49.1 AS src
@@ -15,7 +15,7 @@ FROM ${NODE_IMAGE} AS ui-builder
 WORKDIR /home/ui-builder
 COPY --from=src /src/package.json /src/pnpm-lock.yaml /src/pnpm-workspace.yaml /src/.npmrc ./
 # --ignore-scripts skips `prepare`, which downloads a temporal binary and installs git hooks.
-RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN pnpm install --frozen-lockfile --ignore-scripts --config.node-version=22.23.4
 
 COPY --from=src /src/ ./
 RUN pnpm exec svelte-kit sync && pnpm build:server
