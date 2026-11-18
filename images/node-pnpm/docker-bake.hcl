@@ -6,7 +6,7 @@ target "default" {
       {
         node_version = "22~22.23.4"
         pnpm_version = "10.10"
-        image_tag    = "22.23.2-10.10"
+        image_tag    = "22.23.4-10.10"
       },
       {
         node_version = "24"
