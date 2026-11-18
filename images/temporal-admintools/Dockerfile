@@ -44,7 +44,7 @@ RUN for t in cassandra sql elasticsearch; do \
 FROM ${BASE_IMAGE} AS final
 
 COPY --from=builder /out/ /usr/local/bin/
-COPY --from=src /src/temporal/schema /etc/temporal/schema
+COPY --from=src /src/schema /etc/temporal/schema
 
 RUN apk add --no-cache \
     ca-certificates \
