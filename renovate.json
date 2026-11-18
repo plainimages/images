@@ -1,32 +1,22 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
-  "enabledManagers": ["custom.regex"],
+  "extends": ["config:recommended"],
+  "enabledManagers": ["custom.regex", "github-actions"],
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Upstream source pins in images/<app>/build.env",
-      "managerFilePatterns": [
-        "/^images/[^/]+/build\\.env$/"
-      ],
+      "managerFilePatterns": ["/(^|/)docker-bake\\.hcl$/"],
       "matchStrings": [
-        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: packageName=(?<packageName>\\S+))?(?: versioning=(?<versioning>\\S+))?\\s*\\nBUILD_ARG_UPSTREAM_TAG=(?<currentValue>\\S+)\\s*\\nBUILD_ARG_UPSTREAM_COMMIT=(?<currentDigest>[a-f0-9]{40})"
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+default\\s*=\\s*\"(?<currentValue>[^\"]+)\"\\s*}\\s*variable \"UPSTREAM_COMMIT\"\\s*{\\s*default\\s*=\\s*\"(?<currentDigest>[a-f0-9]{40})\""
       ]
     }
   ],
   "packageRules": [
     {
-      "matchFileNames": [
-        "images/*/build.env"
-      ],
+      "matchFileNames": ["images/*/docker-bake.hcl"],
       "additionalBranchPrefix": "upstream-",
       "commitMessageTopic": "upstream {{depName}}",
-      "labels": [
-        "renovate",
-        "upstream"
-      ]
+      "labels": ["renovate", "upstream"]
     }
   ]
 }

@@ -1,0 +1,15 @@
+name: go
+on:
+  schedule: [{ cron: "0 10 * * *" }]
+  push:
+    branches: [main]
+    paths: ["images/go/**", ".github/workflows/_build.yml"]
+  pull_request:
+    paths: ["images/go/**", ".github/workflows/_build.yml"]
+
+permissions: { contents: read, packages: write }
+
+jobs:
+  build:
+    uses: ./.github/workflows/_build.yml
+    with: { image: go }
