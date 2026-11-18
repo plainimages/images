@@ -12,11 +12,6 @@ FROM ${GO_IMAGE} AS builder
 
 ENV CGO_ENABLED=0
 WORKDIR /src/temporal
-
-COPY --from=src /src/go.mod /src/go.sum ./
-COPY --from=src /src/common/testx/go.mod ./common/testx/go.mod
-RUN go mod download
-
 COPY --from=src /src/ ./
 RUN go build -tags disable_grpc_modules -o /out/temporal-server ./cmd/server
 
