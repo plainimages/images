@@ -21,14 +21,14 @@ ARG TARGETARCH
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH}
 WORKDIR /src
 
-COPY --from=src /src/temporal/go.mod /src/temporal/go.sum ./temporal/
+COPY --from=src /src/go.mod /src/go.sum ./temporal/
 COPY --from=cli-src /src/go.mod /src/go.sum ./cli/
 COPY --from=cli-src /src/cliext/go.mod ./cli/cliext/
 
 RUN go -C temporal mod download && \
     go -C cli mod download
 
-COPY --from=src /src/temporal/ ./temporal/
+COPY --from=src /src/ ./temporal/
 COPY --from=cli-src /src/ ./cli/
 
 # Build temporal-tool cmd binaries
