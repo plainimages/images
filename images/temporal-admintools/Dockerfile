@@ -28,6 +28,8 @@ ARG GO_MOD_OVERRIDES="github.com/jackc/pgx/v5@v5.12.0"
 RUN go -C temporal get ${GO_MOD_OVERRIDES} && \
     go -C temporal mod tidy && \
     go -C temporal mod download && \
+    go -C cli get ${GO_MOD_OVERRIDES} && \
+    go -C cli mod tidy && \
     go -C cli mod download
 
 # Build temporal-tool cmd binaries
