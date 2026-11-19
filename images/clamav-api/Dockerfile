@@ -62,9 +62,9 @@ RUN mkdir -p /var/run/clamav && \
     chmod 750 /var/run/clamav
 
 # Copy configurations
-COPY --from=src /src/docker/clamavd/config/clamav /etc/clamav/
-COPY --from=src /src/docker/common/config/supervisord.conf /etc/supervisord.conf
-COPY --from=src /src/docker/clamavd/config/supervisord /etc/supervisor/conf.d/
+COPY files/clamav /etc/clamav/
+COPY files/supervisord /etc/supervisor/conf.d/
+COPY files/supervisord.conf /etc/supervisord.conf
 
 # Copy init scripts and set permissions
 COPY --from=src /src/docker/common/init /init/
