@@ -22,11 +22,12 @@ RUN protoc --go_out=. --go_opt=paths=source_relative \
            --go-grpc_out=. --go-grpc_opt=paths=source_relative \
            proto/clamav.proto
 
+WORKDIR /src/src
+
 # CVE-2026-78663
 ARG GO_MOD_OVERRIDES="golang.org/x/net@v0.60.0"
 RUN go get ${GO_MOD_OVERRIDES} && go mod tidy
-RUN cd src && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} \
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} \
     go build -o /out/clamav-api .
 
 FROM ${BASE_IMAGE}
