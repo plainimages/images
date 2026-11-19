@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=cgr.dev/chainguard/wolfi-base
-ARG GO_IMAGE=registry.opencode.de/oc000183114358/plainimages/go:1.27.3
+ARG GO_IMAGE=ghcr.io/plainimages/go:1.27
 
 FROM alpine/git AS src
 ARG UPSTREAM_REPO
@@ -25,6 +25,8 @@ COPY --from=src /src/go.mod /src/go.sum ./temporal/
 COPY --from=cli-src /src/go.mod /src/go.sum ./cli/
 COPY --from=cli-src /src/cliext/go.mod ./cli/cliext/
 
+ARG GO_MOD_OVERRIDES="github.com/jackc/pgx/v5@v5.12.0"
+RUN go -C temporal get ${GO_MOD_OVERRIDES} && go mod tidy
 RUN go -C temporal mod download && \
     go -C cli mod download
 
