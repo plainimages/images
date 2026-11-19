@@ -24,12 +24,11 @@ WORKDIR /src
 COPY --from=src /src/ ./temporal/
 COPY --from=cli-src /src/ ./cli/
 
-RUN go -C temporal mod download && \
-    go -C cli mod download
-
 ARG GO_MOD_OVERRIDES="github.com/jackc/pgx/v5@v5.12.0"
 RUN go -C temporal get ${GO_MOD_OVERRIDES} && \
-    go -C temporal mod tidy
+    go -C temporal mod tidy && \
+    go -C temporal mod download && \
+    go -C cli mod download
 
 # Build temporal-tool cmd binaries
 RUN for t in cassandra sql elasticsearch; do \
