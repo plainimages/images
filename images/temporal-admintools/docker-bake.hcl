@@ -24,5 +24,5 @@ target "default" {
     UPSTREAM_CLI_TAG    = UPSTREAM_CLI_TAG
     UPSTREAM_CLI_COMMIT = UPSTREAM_CLI_COMMIT
   }
-  tags = ["ghcr.io/plainimages/temporal-server:${UPSTREAM_TAG}"]
+  tags = ["ghcr.io/plainimages/temporal-admintools:${UPSTREAM_TAG}"]
 }
