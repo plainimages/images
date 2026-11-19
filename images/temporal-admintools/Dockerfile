@@ -8,7 +8,7 @@ ARG UPSTREAM_COMMIT
 RUN git clone --depth 1 --branch "${UPSTREAM_TAG}" "${UPSTREAM_REPO}" /src \
  && test "$(git -C /src rev-parse HEAD)" = "${UPSTREAM_COMMIT}"
 
- FROM alpine/git:2.49.1 AS cli-src
+ FROM alpine/git AS cli-src
  ARG UPSTREAM_CLI_REPO
  ARG UPSTREAM_CLI_TAG
  ARG UPSTREAM_CLI_COMMIT
@@ -21,17 +21,15 @@ ARG TARGETARCH
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH}
 WORKDIR /src
 
-COPY --from=src /src/go.mod /src/go.sum ./temporal/
-COPY --from=cli-src /src/go.mod /src/go.sum ./cli/
-COPY --from=cli-src /src/cliext/go.mod ./cli/cliext/
+COPY --from=src /src/ ./temporal/
+COPY --from=cli-src /src/ ./cli/
 
-ARG GO_MOD_OVERRIDES="github.com/jackc/pgx/v5@v5.12.0"
-RUN go -C temporal get ${GO_MOD_OVERRIDES} && go mod tidy
 RUN go -C temporal mod download && \
     go -C cli mod download
 
-COPY --from=src /src/ ./temporal/
-COPY --from=cli-src /src/ ./cli/
+ARG GO_MOD_OVERRIDES="github.com/jackc/pgx/v5@v5.12.0"
+RUN go -C temporal get ${GO_MOD_OVERRIDES} && \
+    go -C temporal mod tidy
 
 # Build temporal-tool cmd binaries
 RUN for t in cassandra sql elasticsearch; do \
