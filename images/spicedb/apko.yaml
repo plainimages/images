@@ -1,0 +1,38 @@
+contents:
+  keyring:
+    - /work/melange.rsa.pub
+    - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+  repositories:
+    - "@local /work/packages"
+    - https://packages.wolfi.dev/os
+  packages:
+    - wolfi-baselayout
+    - ca-certificates-bundle
+    - grpc-health-probe=0.4.63
+    - spicedb@local
+
+accounts:
+  groups:
+    - groupname: spicedb
+      gid: 65532
+  users:
+    - username: spicedb
+      uid: 65532
+      gid: 65532
+  run-as: "65532"
+
+paths:
+  - path: /etc/spicedb
+    type: directory
+    uid: 65532
+    gid: 0
+    permissions: 0o775
+
+work-dir: /etc/spicedb
+
+entrypoint:
+  command: /usr/bin/spicedb
+
+archs:
+  - aarch64
+  - x86_64

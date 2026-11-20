@@ -1,0 +1,77 @@
+# https://github.com/chainguard-dev/melange/blob/main/docs/BUILD-FILE.md
+package:
+  name: spicedb
+  version: 1.57.1
+  epoch: 0
+  cpe: {}
+  checks: {}
+  dependencies: {} # run time dependencies
+  target-architecture:
+    - x86_64
+    - aarch64
+  copyright:
+    - license: Apache-2.0
+      paths:
+        - "*"
+  description: Zanzibar-inspired authorization database for fine-grained permission checks
+
+environment:
+  environment:
+    CGO_ENABLED: "0"
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/os
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages: # build time dependencies
+      - busybox
+      - ca-certificates-bundle
+      - go=~1.27
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/authzed/spicedb
+      expected-commit: 7074da7242e5aedfeb4586d93a403eca45388ada
+      tag: v${{package.version}}
+
+  - uses: go/bump
+    with:
+      deps: github.com/jackc/pgx/v5@v5.12.0
+
+  - uses: go/build
+    with:
+      tags: memoryprotection
+      ldflags: -s -w -checklinkname=0 -X github.com/jzelinskie/cobrautil/v2.Version=v${{package.version}}
+      packages: ./cmd/spicedb
+      output: ${{package.name}}
+
+test:
+  environment:
+    contents:
+      repositories:
+        - https://packages.wolfi.dev/os
+      keyring:
+        - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+      packages:
+        - busybox
+        - grpc-health-probe
+  pipeline:
+    - name: Version matches package version
+      runs: |
+        spicedb version | grep -F "v${{package.version}}"
+
+    - name: serve-testing starts and reports healthy
+      runs: |
+        spicedb serve-testing --skip-release-check &
+        pid=$!
+        for i in $(seq 1 30); do
+          grpc-health-probe -addr=localhost:50051 && ok=1 && break
+          sleep 1
+        done
+        kill "$pid"
+        [ "${ok:-0}" = 1 ]
+
+capabilities: {}
+update:
+  enabled: false

@@ -1,0 +1,63 @@
+# https://github.com/chainguard-dev/melange/blob/main/docs/BUILD-FILE.md
+package:
+  name: temporal-server
+  version: 1.32.2
+  epoch: 0
+  cpe: {}
+  checks: {}
+  dependencies: {} # run time dependencies
+  target-architecture:
+    - x86_64
+    - aarch64
+  copyright:
+    - license: MIT
+      paths:
+        - "*"
+  description: "Temporal server, executes durable Workflows with automatic retries and failure handling"
+
+environment:
+  environment:
+    CGO_ENABLED: "0"
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/os
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages: # build time dependencies
+      - busybox
+      - ca-certificates-bundle
+      - go=~1.27
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/temporalio/temporal
+      expected-commit: 6d085822273f4336796e6959c73ab1d14a23eb77
+      tag: v${{package.version}}
+
+  - uses: go/bump
+    with:
+      deps: github.com/jackc/pgx/v5@v5.12.0
+
+  - uses: go/build
+    with:
+      tags: enterprise,disable_grpc_modules
+      packages: ./cmd/server
+      output: ${{package.name}}
+
+test:
+  environment:
+    contents:
+      repositories:
+        - https://packages.wolfi.dev/os
+      keyring:
+        - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+      packages:
+        - busybox
+  pipeline:
+    - name: Version
+      runs: temporal-server --version | grep -F "${{package.version}}"
+
+capabilities: {}
+update:
+  enabled: false

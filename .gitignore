@@ -1,0 +1,7 @@
+# local apk package builds with melange
+*packages/**
+# local apko container builds
+*sbom**
+*output.tar
+# certificates used for signing
+*.rsa*

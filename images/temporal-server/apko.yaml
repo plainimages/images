@@ -1,0 +1,40 @@
+contents:
+  keyring:
+    - /work/melange.rsa.pub
+    - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+  repositories:
+    - "@local /work/packages"
+    - https://packages.wolfi.dev/os
+  packages:
+    - wolfi-baselayout
+    - ca-certificates-bundle
+    - tzdata
+    - zlib
+    - temporal-server@local
+
+accounts:
+  groups:
+    - groupname: temporal
+      gid: 65532
+  users:
+    - username: temporal
+      uid: 65532
+      gid: 65532
+  run-as: "65532"
+
+paths:
+  - path: /etc/temporal
+    type: directory
+    uid: 65532
+    gid: 0
+    permissions: 0o775
+
+work-dir: /etc/temporal
+
+entrypoint:
+  command: /usr/bin/temporal-server
+cmd: start
+
+archs:
+  - aarch64
+  - x86_64
