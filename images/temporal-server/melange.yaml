@@ -1,4 +1,3 @@
-
 # https://github.com/chainguard-dev/melange/blob/main/docs/BUILD-FILE.md
 package:
   name: temporal-server
