@@ -1,6 +1,5 @@
 contents:
   keyring:
-    - /work/melange.rsa.pub
     - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
   repositories:
     - "@local /work/packages"

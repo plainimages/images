@@ -3,9 +3,9 @@ on:
   schedule: [{ cron: "0 10 * * *" }]
   push:
     branches: [main]
-    paths: ["images/temporal-server/melange.yaml"]
+    paths: ["images/temporal-server/melange.yaml", "images/temporal-server/apko.yaml"]
   pull_request:
-    paths: ["images/temporal-server/melange.yaml"]
+    paths: ["images/temporal-server/melange.yaml", "images/temporal-server/apko.yaml"]
 
 env:
   SDK: "ghcr.io/wolfi-dev/sdk:latest"
@@ -13,7 +13,7 @@ env:
   IMAGE_SUFFIX: "-apko"
   REGISTRY: "ghcr.io/plainimages"
   VERSION: "v1.32.2"
-  ARCHS: "x86_64"
+  ARCH: "x86_64"
 
 jobs:
   build:
@@ -42,9 +42,17 @@ jobs:
           docker run --rm --privileged -v "${PWD}":/work --workdir=/work \
             --entrypoint=melange "$SDK" \
             build images/${IMAGE_NAME}/melange.yaml \
-            --arch "$ARCHS" \
+            --arch "$ARCH" \
             --signing-key keys/melange.rsa \
             --out-dir packages
+
+      - name: Login to Cloudsmith
+        uses: cloudsmith-io/cloudsmith-cli-action@v3
+        with:
+          api-key: ${{ secrets.CLOUDSMITH_API_KEY }}
+
+      - name: Push to Cloudsmith
+        run: cloudsmith push alpine vvbe/plain-images/wolfi/any-version packages/${ARCH}/*.apk
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v4
@@ -65,6 +73,6 @@ jobs:
           docker run --rm -v "$PWD":/work -w /work \
             -v "$HOME/.docker":/docker-config:ro -e DOCKER_CONFIG=/docker-config \
             --entrypoint=apko "$SDK" "${args[@]}" \
-            --arch "$ARCHS" \
+            --arch "$ARCH" \
             -k /work/keys/melange.rsa.pub \
             -r /work/packages
