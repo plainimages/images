@@ -4,4 +4,8 @@
 *sbom**
 *output.tar
 # certificates used for signing
-*.rsa*
+*.rsa
+!*.rsa.pub
+
+# temporary files
+*.tmp.txt
