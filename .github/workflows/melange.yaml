@@ -9,7 +9,7 @@ on:
 
 env:
   SDK: ghcr.io/wolfi-dev/sdk:latest
-  IMAGE_NAME: temporal-admintools
+  IMAGE_NAME: temporal-server
   VERSION: v1.32.2
 
 jobs:
