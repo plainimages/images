@@ -8,11 +8,12 @@ on:
     paths: ["images/temporal-server/melange.yaml"]
 
 env:
-  SDK: ghcr.io/wolfi-dev/sdk:latest
-  IMAGE_NAME: temporal-server
-  REGISTRY: ghcr.io/plainimages
-  VERSION: v1.32.2
-  ARCHS: x86_64
+  SDK: "ghcr.io/wolfi-dev/sdk:latest"
+  IMAGE_NAME: "temporal-server"
+  IMAGE_SUFFIX: "-apko"
+  REGISTRY: "ghcr.io/plainimages"
+  VERSION: "v1.32.2"
+  ARCHS: "x86_64"
 
 jobs:
   build:
@@ -54,7 +55,7 @@ jobs:
 
       - name: apko
         run: |
-          ref="${REGISTRY}/${IMAGE_NAME}:${VERSION}"
+          ref="${REGISTRY}/${IMAGE_NAME}${IMAGE_SUFFIX}:${VERSION}"
           if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
             args=(build "images/${IMAGE_NAME}/apko.yaml" "$ref" image.tar)
           else
