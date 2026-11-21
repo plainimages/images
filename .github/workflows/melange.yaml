@@ -65,5 +65,5 @@ jobs:
             -v "$HOME/.docker":/docker-config:ro -e DOCKER_CONFIG=/docker-config \
             --entrypoint=apko "$SDK" "${args[@]}" \
             --arch "$ARCHS" \
-            -k /work/keys/plainimages.rsa.pub \
+            -k /work/keys/melange.rsa.pub \
             -r /work/packages
