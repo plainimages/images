@@ -1,0 +1,44 @@
+name: temporal-server-melange
+on:
+  schedule: [{ cron: "0 10 * * *" }]
+  push:
+    branches: [main]
+    paths: ["images/temporal-server/melange.yaml"]
+  pull_request:
+    paths: ["images/temporal-server/melange.yaml"]
+
+env:
+  SDK: ghcr.io/wolfi-dev/sdk:latest
+  IMAGE_NAME: temporal-admintools
+  VERSION: v1.32.2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: { contents: read, packages: write }
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v7
+
+      - name: signing key
+        env:
+          MELANGE_RSA: ${{ secrets.MELANGE_RSA }}
+        run: |
+          mkdir -p keys
+          if [ -n "$MELANGE_RSA" ]; then
+            printf '%s\n' "$MELANGE_RSA" > keys/melange.rsa
+            chmod 600 keys/melange.rsa
+          else
+            # no secret (e.g. fork PR): throwaway key, overwrites the .pub for this run only
+            docker run --rm -v "$PWD":/work -w /work \
+              --entrypoint=melange "$SDK" keygen keys/melange.rsa
+          fi
+
+      - name: melange build
+        run: |
+          docker run --rm --privileged -v "${PWD}":/work --workdir=/work \
+            --entrypoint=melange "$SDK" \
+            build images/${IMAGE_NAME}/melange.yaml \
+            --arch x86_64,aarch64 \
+            --signing-key keys/melange.rsa \
+            --out-dir packages
