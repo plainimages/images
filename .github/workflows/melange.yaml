@@ -10,7 +10,9 @@ on:
 env:
   SDK: ghcr.io/wolfi-dev/sdk:latest
   IMAGE_NAME: temporal-server
+  REGISTRY: ghcr.io/plainimages
   VERSION: v1.32.2
+  ARCHS: x86_64
 
 jobs:
   build:
@@ -39,6 +41,29 @@ jobs:
           docker run --rm --privileged -v "${PWD}":/work --workdir=/work \
             --entrypoint=melange "$SDK" \
             build images/${IMAGE_NAME}/melange.yaml \
-            --arch x86_64,aarch64 \
+            --arch "$ARCHS" \
             --signing-key keys/melange.rsa \
             --out-dir packages
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: apko
+        run: |
+          ref="${REGISTRY}/${IMAGE_NAME}:${VERSION}"
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            args=(build "images/${IMAGE_NAME}/apko.yaml" "$ref" image.tar)
+          else
+            args=(publish "images/${IMAGE_NAME}/apko.yaml" "$ref")
+          fi
+          mkdir -p "$HOME/.docker"
+          docker run --rm -v "$PWD":/work -w /work \
+            -v "$HOME/.docker":/docker-config:ro -e DOCKER_CONFIG=/docker-config \
+            --entrypoint=apko "$SDK" "${args[@]}" \
+            --arch "$ARCHS" \
+            -k /work/keys/plainimages.rsa.pub \
+            -r /work/packages
