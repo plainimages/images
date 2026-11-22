@@ -12,4 +12,6 @@ permissions: { contents: read, packages: write }
 jobs:
   build:
     uses: ./.github/workflows/_build-cgr.yml
-    with: { image: spicedb }
+    with:
+      image: spicedb
+      archs: x86_64

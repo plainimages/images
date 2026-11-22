@@ -1,16 +1,16 @@
 on:
   workflow_call:
     inputs:
-      image: { type: string, required: true }
-      # melange package to build; defaults to `image` (e.g. temporal-admintools reuses temporal-server)
-      package: { type: string, required: false, default: "" }
-
-env:
-  SDK: "ghcr.io/wolfi-dev/sdk:latest"
-  ARCH: "x86_64"
-  IMAGE_SUFFIX: "-apko"
-  REGISTRY: "ghcr.io/plainimages"
-  CACHE_DIR: ".cache/melange"
+      image:
+        required: true
+        type: string
+      archs:
+        required: true
+        type: string
+      package:
+        required: false
+        type: string
+        default: ""
 
 jobs:
   build:
@@ -26,32 +26,17 @@ jobs:
         env:
           MELANGE_RSA: ${{ secrets.MELANGE_RSA }}
         run: |
-          mkdir -p keys
-          if [ -n "$MELANGE_RSA" ]; then
-            printf '%s\n' "$MELANGE_RSA" > keys/melange.rsa
-            chmod 600 keys/melange.rsa
-          else
-            # no secret (e.g. fork PR): throwaway key, overwrites the .pub for this run only
-            docker run --rm -v "$PWD":/work -w /work \
-              --entrypoint=melange "$SDK" keygen keys/melange.rsa
-          fi
+          printf '%s\n' "$MELANGE_RSA" > keys/melange.rsa
+          chmod 600 keys/melange.rsa
 
-      - name: melange build
-        run: |
-          docker run --rm --privileged -v "${PWD}":/work --workdir=/work \
-            --entrypoint=melange "$SDK" \
-            build "$MELANGE_CONFIG" \
-            --arch "$ARCH" \
-            --signing-key keys/melange.rsa \
-            --out-dir packages \
-            --cache-dir "$CACHE_DIR"
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4
+      - uses: chainguard-dev/actions/melange-build@main
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          archs: ${{ inputs.archs }}
+          config: images/${{ inputs.package || inputs.image }}/melange.yaml
+          signing-key-path: /keys/melange.rsa
+          sign-with-own-key: true
+          repository-path: /packages
+          cache-dir: ".cache/melange"
 
       - name: Get package version
         uses: mikefarah/yq@master
@@ -59,18 +44,10 @@ jobs:
         with:
           cmd: yq '.package.version' ${{ env.MELANGE_CONFIG }}
 
-      - name: apko
-        run: |
-          ref="${REGISTRY}/${{ inputs.image }}${IMAGE_SUFFIX}:${{ steps.yq_get_version.outputs.result }}"
-          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
-            args=(build "images/${{ inputs.image }}/apko.yaml" "$ref" image.tar)
-          else
-            args=(publish "images/${{ inputs.image }}/apko.yaml" "$ref")
-          fi
-          mkdir -p "$HOME/.docker"
-          docker run --rm -v "$PWD":/work -w /work \
-            -v "$HOME/.docker":/docker-config:ro -e DOCKER_CONFIG=/docker-config \
-            --entrypoint=apko "$SDK" "${args[@]}" \
-            --arch "$ARCH" \
-            -k /work/keys/melange.rsa.pub \
-            -r /work/packages
+      - uses: distroless/actions/apko-publish@main
+        with:
+          config: images/${{ inputs.image }}/apko.yaml
+          tag: ghcr.io/plainimages/${{ inputs.image }}-apko:${{ steps.yq_get_version.outputs.result }}
+          keyring-append: /keys/melange.rsa.pub
+          repository-append: /packages
+          token: ${{ secrets.GITHUB_TOKEN }}
