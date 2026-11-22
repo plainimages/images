@@ -20,7 +20,7 @@ jobs:
       MELANGE_CONFIG: images/${{ inputs.package || inputs.image }}/melange.yaml
     steps:
       - name: checkout repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
 
       - name: signing key
         env:
@@ -29,7 +29,7 @@ jobs:
           printf '%s\n' "$MELANGE_RSA" > keys/melange.rsa
           chmod 600 keys/melange.rsa
 
-      - uses: chainguard-dev/actions/melange-build@main
+      - uses: chainguard-dev/actions/melange-build@2993c8809dbe6a42dd25a9029084911611d971d2
         with:
           archs: ${{ inputs.archs }}
           config: images/${{ inputs.package || inputs.image }}/melange.yaml
@@ -39,12 +39,12 @@ jobs:
           cache-dir: ".cache/melange"
 
       - name: Get package version
-        uses: mikefarah/yq@master
+        uses: mikefarah/yq@2a40eb3d0468c44adca0109c4e6b941967259142
         id: yq_get_version
         with:
           cmd: yq '.package.version' ${{ env.MELANGE_CONFIG }}
 
-      - uses: distroless/actions/apko-build@main
+      - uses: distroless/actions/apko-build@dfbb1c81d6dc9ee83678464477ad2eef0fa11271
         if: ${{ github.event_name == 'pull_request' }}
         with:
           config: images/${{ inputs.image }}/apko.yaml
@@ -52,7 +52,7 @@ jobs:
           keyring-append: keys/melange.rsa.pub
           repository-append: packages
 
-      - uses: distroless/actions/apko-publish@main
+      - uses: distroless/actions/apko-publish@dfbb1c81d6dc9ee83678464477ad2eef0fa11271
         if: ${{ github.event_name != 'pull_request' }}
         with:
           config: images/${{ inputs.image }}/apko.yaml
