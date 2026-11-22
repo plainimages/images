@@ -14,5 +14,5 @@ jobs:
     uses: ./.github/workflows/_build-cgr.yml
     secrets: inherit
     with:
-      image: temporal-server
+      image: temporal-ui
       archs: x86_64
