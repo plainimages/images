@@ -33,9 +33,9 @@ jobs:
         with:
           archs: ${{ inputs.archs }}
           config: images/${{ inputs.package || inputs.image }}/melange.yaml
-          signing-key-path: /keys/melange.rsa
+          signing-key-path: keys/melange.rsa
           sign-with-own-key: true
-          repository-path: /packages
+          repository-path: packages
           cache-dir: ".cache/melange"
 
       - name: Get package version
@@ -48,6 +48,6 @@ jobs:
         with:
           config: images/${{ inputs.image }}/apko.yaml
           tag: ghcr.io/plainimages/${{ inputs.image }}-apko:${{ steps.yq_get_version.outputs.result }}
-          keyring-append: /keys/melange.rsa.pub
-          repository-append: /packages
+          keyring-append: keys/melange.rsa.pub
+          repository-append: packages
           token: ${{ secrets.GITHUB_TOKEN }}
