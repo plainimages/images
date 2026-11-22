@@ -36,5 +36,4 @@ entrypoint:
 cmd: start
 
 archs:
-  - aarch64
   - x86_64
