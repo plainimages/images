@@ -15,4 +15,5 @@ jobs:
     secrets: inherit
     with:
       image: temporal-admintools
+      package: temporal-server
       archs: x86_64
