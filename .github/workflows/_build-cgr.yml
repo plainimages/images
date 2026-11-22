@@ -44,7 +44,16 @@ jobs:
         with:
           cmd: yq '.package.version' ${{ env.MELANGE_CONFIG }}
 
+      - uses: distroless/actions/apko-build@main
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          config: images/${{ inputs.image }}/apko.yaml
+          tag: ghcr.io/plainimages/${{ inputs.image }}-apko:${{ steps.yq_get_version.outputs.result }}
+          keyring-append: keys/melange.rsa.pub
+          repository-append: packages
+
       - uses: distroless/actions/apko-publish@main
+        if: ${{ github.event_name != 'pull_request' }}
         with:
           config: images/${{ inputs.image }}/apko.yaml
           tag: ghcr.io/plainimages/${{ inputs.image }}-apko:${{ steps.yq_get_version.outputs.result }}
