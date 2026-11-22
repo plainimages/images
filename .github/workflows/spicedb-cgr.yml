@@ -1,0 +1,15 @@
+name: spicedb
+on:
+  schedule: [{ cron: "0 10 * * *" }]
+  push:
+    branches: [main]
+    paths: ["images/spicedb/**.yaml", ".github/workflows/_build-cgr.yml"]
+  pull_request:
+    paths: ["images/spicedb/**.yaml", ".github/workflows/_build-cgr.yml"]
+
+permissions: { contents: read, packages: write }
+
+jobs:
+  build:
+    uses: ./.github/workflows/_build.yml
+    with: { image: spicedb }

@@ -1,0 +1,59 @@
+# https://github.com/chainguard-dev/melange/blob/main/docs/BUILD-FILE.md
+package:
+  name: temporal-ui
+  version: 2.58.1
+  epoch: 0
+  cpe: {}
+  checks: {}
+  dependencies: {} # run time dependencies
+  target-architecture: []
+  copyright:
+    - license: MIT
+      paths:
+        - "*"
+  description: "Temporal ui, executes durable Workflows with automatic retries and failure handling"
+
+environment:
+  environment:
+    CGO_ENABLED: "0"
+    npm_config_node_version: "22.23.4"
+    npm_config_store_dir: /var/cache/melange/pnpm-store
+    npm_config_manage_package_manager_versions: "false" # disable pnpm trying to up/downgrade itself
+  contents:
+    repositories:
+      - https://packages.wolfi.dev/os
+    keyring:
+      - https://packages.wolfi.dev/os/wolfi-signing.rsa.pub
+    packages: # build time dependencies
+      - busybox
+      - ca-certificates-bundle
+      - go=~1.26
+      - nodejs=~22
+      - pnpm=~10
+
+pipeline:
+  - uses: git-checkout
+    with:
+      repository: https://github.com/temporalio/ui
+      expected-commit: 32edd95c5d2e09d5fceaecbe9d4277c794b6df48
+      tag: v${{package.version}}
+
+  - runs: |
+      pnpm install --frozen-lockfile --ignore-scripts
+      pnpm exec svelte-kit sync
+      pnpm build:server
+
+  - uses: go/build
+    with:
+      modroot: ./server
+      packages: ./cmd/server
+      output: ${{package.name}}
+
+  - runs: |
+      chmod 0755 ${{targets.contextdir}}/usr/bin/${{package.name}}
+      install -Dm644 server/config/docker.yaml \
+        ${{targets.contextdir}}/etc/temporal-ui/config/docker.yaml
+
+capabilities: {}
+update:
+  enabled: false

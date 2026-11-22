@@ -3,9 +3,9 @@ on:
   schedule: [{ cron: "0 10 * * *" }]
   push:
     branches: [main]
-    paths: ["images/spicedb/**", ".github/workflows/_build.yml"]
+    paths: ["images/spicedb/Dockerfile", "images/spicedb/docker-bake.hcl", ".github/workflows/_build.yml"]
   pull_request:
-    paths: ["images/spicedb/**", ".github/workflows/_build.yml"]
+    paths: ["images/spicedb/Dockerfile", "images/spicedb/docker-bake.hcl", ".github/workflows/_build.yml"]
 
 permissions: { contents: read, packages: write }
 

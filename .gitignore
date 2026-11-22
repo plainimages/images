@@ -9,3 +9,6 @@
 
 # temporary files
 *.tmp.txt
+
+# local build cache
+*.cache/*

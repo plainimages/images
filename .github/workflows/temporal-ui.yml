@@ -3,9 +3,9 @@ on:
   schedule: [{ cron: "0 10 * * *" }]
   push:
     branches: [main]
-    paths: ["images/temporal-ui/**", ".github/workflows/_build.yml"]
+    paths: ["images/temporal-ui/Dockerfile", "images/temporal-ui/docker-bake.hcl", ".github/workflows/_build.yml"]
   pull_request:
-    paths: ["images/temporal-ui/**", ".github/workflows/_build.yml"]
+    paths: ["images/temporal-ui/Dockerfile", "images/temporal-ui/docker-bake.hcl", ".github/workflows/_build.yml"]
 
 permissions: { contents: read, packages: write }
 
