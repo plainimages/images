@@ -2,6 +2,8 @@ on:
   workflow_call:
     inputs:
       image: { type: string, required: true }
+      # melange package to build; defaults to `image` (e.g. temporal-admintools reuses temporal-server)
+      package: { type: string, required: false, default: "" }
 
 env:
   SDK: "ghcr.io/wolfi-dev/sdk:latest"
@@ -14,6 +16,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions: { contents: read, packages: write }
+    env:
+      MELANGE_CONFIG: images/${{ inputs.package || inputs.image }}/melange.yaml
     steps:
       - name: checkout repo
         uses: actions/checkout@v7
@@ -36,7 +40,7 @@ jobs:
         run: |
           docker run --rm --privileged -v "${PWD}":/work --workdir=/work \
             --entrypoint=melange "$SDK" \
-            build images/${{ inputs.image }}/melange.yaml \
+            build "$MELANGE_CONFIG" \
             --arch "$ARCH" \
             --signing-key keys/melange.rsa \
             --out-dir packages \
@@ -53,7 +57,7 @@ jobs:
         uses: mikefarah/yq@master
         id: yq_get_version
         with:
-          cmd: yq '.package.version' images/${{ inputs.image }}/melange.yaml
+          cmd: yq '.package.version' ${{ env.MELANGE_CONFIG }}
 
       - name: apko
         run: |

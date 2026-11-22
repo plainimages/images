@@ -3,13 +3,13 @@ on:
   schedule: [{ cron: "0 10 * * *" }]
   push:
     branches: [main]
-    paths: ["images/temporal-admintools/**.yaml", ".github/workflows/_build-cgr.yml", ".github/workflows/temporal-admintools-cgr.yml"]
+    paths: ["images/temporal-admintools/**.yaml", "images/temporal-server/melange.yaml", ".github/workflows/_build-cgr.yml", ".github/workflows/temporal-admintools-cgr.yml"]
   pull_request:
-    paths: ["images/temporal-admintools/**.yaml", ".github/workflows/_build-cgr.yml", ".github/workflows/temporal-admintools-cgr.yml"]
+    paths: ["images/temporal-admintools/**.yaml", "images/temporal-server/melange.yaml", ".github/workflows/_build-cgr.yml", ".github/workflows/temporal-admintools-cgr.yml"]
 
 permissions: { contents: read, packages: write }
 
 jobs:
   build:
     uses: ./.github/workflows/_build-cgr.yml
-    with: { image: temporal-admintools }
+    with: { image: temporal-admintools, package: temporal-server }
