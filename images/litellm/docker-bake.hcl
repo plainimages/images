@@ -1,9 +1,9 @@
 variable "UPSTREAM_TAG" {
   # renovate: datasource=github-tags depName=BerriAI/litellm
-  default = "v1.110.1"
+  default = "v1.111.0"
 }
 variable "UPSTREAM_COMMIT" {
-  default = "47b394ba1b5bbe7f4b3f119a95b56957f4a32fad"
+  default = "e3370c9d6152cc4407a55e06c101e3c7dd4168ab"
 }
 
 target "default" {
