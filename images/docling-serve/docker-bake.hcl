@@ -1,9 +1,9 @@
 variable "UPSTREAM_TAG" {
   # renovate: datasource=github-tags depName=docling-project/docling-serve
-  default = "v1.38.2"
+  default = "v1.40.0"
 }
 variable "UPSTREAM_COMMIT" {
-  default = "9c058dbb58f61021e3a16e37edb8a7527b2cb2d4"
+  default = "5c101b6c67cd57e662e9abfebee7d2a6fc2b0cb4"
 }
 
 target "default" {
